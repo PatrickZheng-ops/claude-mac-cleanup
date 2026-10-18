@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="__CSP__">
+<title>Claude Mac 清理证据汇总</title>
+<style>
+:root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#263128;background:#f6f5ef;line-height:1.55}*{box-sizing:border-box}body{max-width:1500px;margin:auto;padding:36px 30px 80px}h1{font-size:clamp(26px,4vw,42px);line-height:1.2;margin:8px 0 18px}h2{font-size:23px;margin-top:36px}p{margin:8px 0}.eyebrow{font-size:13px;color:#596651;letter-spacing:.1em}.important{border-left:4px solid #97542d;padding:12px 18px;background:#fff5e9;font-weight:600}.notice{padding-left:24px;color:#525b50;font-size:14px}.metrics{display:flex;gap:12px;flex-wrap:wrap;margin:25px 0}.metric{background:#fff;border:1px solid #d9dfd5;padding:13px 20px;min-width:150px}.metric strong{display:block;font-size:27px}.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:24px 0 12px}.controls input,.controls select,button{font:inherit;border:1px solid #b9c3b4;border-radius:5px;background:white;color:#263128;padding:9px 12px}.controls input{flex:1;min-width:230px}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}label{font-size:14px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;background:#fff;font-size:14px}th{text-align:left;background:#e5eadf;white-space:nowrap}td,th{padding:13px 14px;border-bottom:1px solid #e2e6de;vertical-align:top}td{overflow-wrap:anywhere}td.object{min-width:210px;max-width:380px}td.detail{min-width:270px;max-width:520px}.status{display:inline-block;font-size:12px;font-weight:650;padding:3px 7px;border-radius:4px;background:#edf1e8;white-space:nowrap}.status[data-level="attention"]{background:#ffecd6;color:#73401c}.status[data-level="error"]{background:#ffe1dd;color:#8b2619}details summary{cursor:pointer;color:#465b3c}.muted{color:#616b5a;font-size:13px}.pagination{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-top:18px}.coverage{font-size:13px}#result-count{font-size:14px;color:#596651}footer{margin-top:38px;border-top:1px solid #cdd5c7;padding-top:18px;color:#626b5d;font-size:13px}@media(max-width:650px){body{padding:24px 14px 55px}td,th{padding:10px}.controls{align-items:stretch}.controls label{display:flex;flex-direction:column}.pagination{flex-wrap:wrap}}@media print{.controls,.pagination,button{display:none}.table-wrap{overflow:visible}body{max-width:none;padding:0}.metric{break-inside:avoid}tr{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="eyebrow">PRIVATE · OFFLINE · REVIEW ONLY</div>
+<h1>Claude Mac 清理证据汇总</h1>
+<p id="generated" class="muted"></p>
+<p class="important">本报告不判定整机清理完成，也不授予删除或恢复权限。</p>
+<ul id="notices" class="notice"></ul>
+<div id="metrics" class="metrics"></div>
+<h2>输入覆盖范围</h2>
+<div class="table-wrap"><table class="coverage"><thead><tr><th>模块</th><th>已保存的证据文件</th><th>观察时间</th></tr></thead><tbody id="sources"></tbody></table></div>
+<h2>对象与检查项</h2>
+<p class="muted">残留、失败和未核验项优先。条目总数不等于文件总数；URL、访问次数、下载 ID 和来源链分别计数。点击展开可查看证据引用。</p>
+<div class="controls">
+<input id="search" type="search" placeholder="搜索对象、路径、说明或证据引用" aria-label="搜索检查项">
+<label>模块 <select id="module"><option value="">全部模块</option></select></label>
+<label>状态 <select id="status"><option value="">全部状态</option></select></label>
+<label>每页 <select id="page-size"><option>50</option><option>100</option><option>200</option><option value="all" selected>全部</option></select></label>
+<button id="export" type="button">导出只读审阅 JSON</button>
+</div>
+<p id="result-count" aria-live="polite"></p>
+<div class="table-wrap"><table><thead><tr><th>模块 / 类别</th><th>状态</th><th>对象</th><th>数量和单位</th><th>证据与限制</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="pagination"><button id="previous" type="button">上一页</button><span id="page-label"></span><button id="next" type="button">下一页</button></div>
+<footer>数据来自用户指定的已保存 JSON。所有记录只用于审阅：cleanup_authorized=false，restore_authorized=false，operations=[]。没有清理、恢复或联网接口。分享前复核文件名和自由文本中的敏感信息。</footer>
+<script type="application/json" id="payload">__PAYLOAD__</script>
+<script>
+"use strict";
+const report = JSON.parse(document.getElementById("payload").textContent);
+const el = id => document.getElementById(id);
+const add = (parent, tag, text, className) => { const node = document.createElement(tag); node.textContent = text; if (className) node.className = className; parent.appendChild(node); return node; };
+const metricText = row => row.counts.map(x => `${x.label}：${x.value === null ? "未核验" : x.value} ${x.unit_label}`).join("；");
+el("generated").textContent = `报告生成于 ${report.generated_at} · ${report.sources.length} 份输入证据`;
+report.notices.forEach(x => add(el("notices"), "li", x));
+const attention = new Set(["failed", "access_denied", "residual", "not_checked", "attempted_unverified", "partial", "changed"]);
+[["审阅项", report.row_count], ["需关注项", report.rows.filter(x => attention.has(x.status)).length], ["输入模块", new Set(report.sources.map(x => x.module)).size]].forEach(([title, value]) => {const box = add(el("metrics"), "div", "", "metric"); add(box, "span", title); add(box, "strong", String(value)); });
+report.sources.forEach(source => {const tr = add(el("sources"), "tr", ""); [source.module, source.file, source.observed_at].forEach(x => add(tr, "td", x)); });
+Array.from(new Set(report.rows.map(x => x.module))).forEach(module => {const option = add(el("module"), "option", module); option.value = module; });
+const statuses = new Map(report.rows.map(x => [x.status, x.status_label]));
+statuses.forEach((label, status) => {const option = add(el("status"), "option", label); option.value = status; });
+let page = 0;
+function refresh(reset) {
+  if (reset) page = 0;
+  const search = el("search").value.toLocaleLowerCase();
+  const filtered = report.rows.filter(row => (!el("module").value || row.module === el("module").value) && (!el("status").value || row.status === el("status").value) && (!search || [row.target, row.category, row.note, row.module, row.status_label, row.evidence_refs.join(" "), row.approval_ref || ""].join(" ").toLocaleLowerCase().includes(search)));
+  const size = el("page-size").value === "all" ? Math.max(1, filtered.length) : Number(el("page-size").value);
+  const pages = Math.max(1, Math.ceil(filtered.length / size)); page = Math.min(page, pages - 1);
+  el("rows").replaceChildren();
+  filtered.slice(page * size, (page + 1) * size).forEach(row => {
+    const tr = add(el("rows"), "tr", ""); add(tr, "td", `${row.module} / ${row.category}`);
+    const status = add(add(tr, "td", ""), "span", row.status_label, "status");
+    status.dataset.level = ["failed", "access_denied"].includes(row.status) ? "error" : (attention.has(row.status) ? "attention" : "normal");
+    add(tr, "td", row.target, "object"); add(tr, "td", metricText(row));
+    const td = add(tr, "td", row.note, "detail");
+    if (row.evidence_refs.length || row.approval_ref) { const details = add(td, "details", ""); add(details, "summary", "查看引用"); row.evidence_refs.forEach(x => add(details, "p", `证据：${x}`, "muted")); if (row.approval_ref) add(details, "p", `批准引用：${row.approval_ref}（未由报告核实）`, "muted"); }
+  });
+  el("result-count").textContent = `匹配 ${filtered.length} 项 / 共 ${report.row_count} 项`;
+  el("page-label").textContent = `第 ${page + 1} / ${pages} 页`;
+  el("previous").disabled = page === 0; el("next").disabled = page + 1 >= pages;
+}
+["search", "module", "status", "page-size"].forEach(id => el(id).addEventListener(id === "search" ? "input" : "change", () => refresh(true)));
+el("previous").addEventListener("click", () => { page -= 1; refresh(false); });
+el("next").addEventListener("click", () => { page += 1; refresh(false); });
+let printState = null;
+window.addEventListener("beforeprint", () => { printState = {size: el("page-size").value, page}; el("page-size").value = "all"; refresh(true); });
+window.addEventListener("afterprint", () => { if (printState) { el("page-size").value = printState.size; page = printState.page; printState = null; refresh(false); } });
+el("export").addEventListener("click", () => {
+  const exported = {...report, mode: "review-only", cleanup_authorized: false, restore_authorized: false, operations: []};
+  const url = URL.createObjectURL(new Blob([JSON.stringify(exported, null, 2)], {type: "application/json"}));
+  const link = document.createElement("a"); link.href = url; link.download = "claude-cleanup-review-only.json"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+refresh(true);
+</script>
+</body>
+</html>
