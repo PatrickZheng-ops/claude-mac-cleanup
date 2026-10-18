@@ -1,0 +1,24 @@
+# Per-machine declarations, audits, backups and runtime data stay local.
+.local/
+local-config*.json
+*audit*.json
+*receipt*.json
+*policy*.json
+*.jsonl
+*.sqlite*
+*.db
+*.db-*
+.env
+.env.*
+*.pem
+*.key
+*.zip
+__pycache__/
+*.pyc
+.DS_Store
+.test-fixtures-*/
+test-artifacts/
+dist/
+# Optional upstream source is fetched by each user, never republished here.
+vendor/cc-clean/*
+!vendor/cc-clean/SOURCE.json
