@@ -1,0 +1,33 @@
+name: Synthetic validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      optional_upstream:
+        description: Explicitly fetch the pinned optional upstream for this test run
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  base:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check public file allowlist
+        run: python3 -B scripts/release_guard.py --tracked
+      - name: Run isolated synthetic base tests
+        run: python3 -B scripts/check_skill.py
+      - name: Fetch optional source only when explicitly selected
+        if: github.event_name == 'workflow_dispatch' && inputs.optional_upstream
+        run: python3 -B scripts/fetch_cc_clean.py --accept-unlicensed-source
+      - name: Run optional full validation
+        if: github.event_name == 'workflow_dispatch' && inputs.optional_upstream
+        run: python3 -B scripts/check_skill.py --require-upstream
