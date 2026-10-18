@@ -1,0 +1,40 @@
+{
+  "upstream": "https://github.com/luwill/cc-clean",
+  "commit": "0be9fdafa4fdd7894997db8335eaa47720c36627",
+  "version": "0.2.2",
+  "purpose": "Metadata-only pin for an optional dependency fetched directly from its upstream repository by an explicit local action. Upstream implementation is not distributed in this public skill.",
+  "license_observation": "No LICENSE was present in the reviewed commit. This metadata and the opt-in downloader do not grant a license or redistribution permission.",
+  "modifications": "No upstream implementation is included. If explicitly fetched, all six files must match their pinned SHA-256 values and remain unmodified.",
+  "files": [
+    {
+      "path": "cc-clean/scripts/local_state.py",
+      "sha256": "0403982b6d974108091fdd7535fdab415c0dca9aaf72ef6b30cf2b29972c7af8",
+      "upstream_url": "https://github.com/luwill/cc-clean/blob/0be9fdafa4fdd7894997db8335eaa47720c36627/cc-clean/scripts/local_state.py"
+    },
+    {
+      "path": "cc-clean/scripts/review_tools.py",
+      "sha256": "b4e0f343ed201ddaacd11542b1276bf506b64352266fde8c9fcf9ffab55f8182",
+      "upstream_url": "https://github.com/luwill/cc-clean/blob/0be9fdafa4fdd7894997db8335eaa47720c36627/cc-clean/scripts/review_tools.py"
+    },
+    {
+      "path": "cc-clean/assets/report.html",
+      "sha256": "29ec98bbdb7352950cbcd174a01b08c388408a68142d68613aab9cb67ed3ce30",
+      "upstream_url": "https://github.com/luwill/cc-clean/blob/0be9fdafa4fdd7894997db8335eaa47720c36627/cc-clean/assets/report.html"
+    },
+    {
+      "path": "test_local_state.py",
+      "sha256": "7e828ad917844ec6bc513e73326d630a75b0c4de96fd36cd9d525f8aede5c825",
+      "upstream_url": "https://github.com/luwill/cc-clean/blob/0be9fdafa4fdd7894997db8335eaa47720c36627/test_local_state.py"
+    },
+    {
+      "path": "test_review_tools.py",
+      "sha256": "367a95c4fefefb1db425eb757bc0cfa6db77d8561672d98dc24479bc90f39aa5",
+      "upstream_url": "https://github.com/luwill/cc-clean/blob/0be9fdafa4fdd7894997db8335eaa47720c36627/test_review_tools.py"
+    },
+    {
+      "path": "test_device_ids.py",
+      "sha256": "ae3ab3f66c66ef245af03c619e2898f8ef18395a7cddc874d37e8bf388cb6985",
+      "upstream_url": "https://github.com/luwill/cc-clean/blob/0be9fdafa4fdd7894997db8335eaa47720c36627/test_device_ids.py"
+    }
+  ]
+}
