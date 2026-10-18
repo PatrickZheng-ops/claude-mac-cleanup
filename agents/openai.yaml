@@ -1,0 +1,4 @@
+interface:
+  display_name: "Claude Mac 痕迹清理"
+  short_description: "定向检查 Mac 上的 Claude 痕迹，保护声明目录并生成清理核验报告"
+  default_prompt: "请使用 $claude-mac-cleanup 先对这台 Mac 做只读检查。读取并校验本地保护配置；尚未配置时，引导我声明应保护的项目/成果目录和审计输出位置，期间仅做有限只读盘点。默认保留官方 App、工作成果及共享环境。给出具体清理范围、影响和证据；只有我明确要求执行并批准具体不可逆范围后，才按批准操作、逐项验收并报告残留。"
